@@ -4,12 +4,12 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from . import models
 
-admin.site.site_title = "Bhagwati Tyres"
+admin.site.site_title = "Shivankar Distributors"
 admin.site.index_title = "Messy"
 
 
 class MyAdminSite(admin.AdminSite):
-    site_title = "Bhagwati Tyres"
+    site_title = "Shivankar Distributors"
     index_title = "Messy"
 
     site_header = "JASKDLASJD"
@@ -58,6 +58,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 class PhotoAdmin(admin.ModelAdmin):
     icon = '<i class="material-icons">photo</i>'
+
 
 admin_site.register(models.KentUser, KentUserAdmin)
 admin_site.register(models.Technician, TechnicianAdmin)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from sms_utils import send_sms
 
 
 class KentUser(models.Model):
@@ -19,6 +20,8 @@ class KentUser(models.Model):
     warranty_status = models.CharField(max_length=63, choices=WARRANTY_STATUS, null=True, blank=True)
     accessories = models.CharField(max_length=127, null=True, blank=True)
     remark = models.CharField(max_length=127, null=True, blank=True)
+    area = models.CharField(max_length=1027, null=True, blank=True)
+    sub_area = models.CharField(max_length=1027, null=True, blank=True)
 
     def __unicode__(self):
         return "{}-{}".format(self.name, self.phone)
@@ -48,6 +51,26 @@ class ServiceTask(models.Model):
     status = models.BooleanField(default=False)
     technician_reached = models.DateTimeField(null=True, blank=True)
     technician_departed = models.DateTimeField(null=True, blank=True)
+
+    def get_service_status(self):
+        if not self.pk:
+            # This is a new complaint
+            message = "Your complaint for Kent has been registered. " \
+                      "A technician will be attending you soon. Complaint Number:#"
+        elif self.status:
+            # The work has been done
+            message = "Your Kent machine has been serviced. " \
+                      "Please contact 9494949494 for further help. Complaint Number:#"
+
+        return message
+
+    def save(self, *args, **kwargs):
+        # Need to send the customer a message that complaint has been
+        # registered, serviced or cancelled.
+        message = self.get_service_status()
+        super(ServiceTask, self).save(*args, **kwargs)
+        message = message + str(self.pk)
+        send_sms(message, self.customer)
 
     def __unicode__(self):
         return "{} - {} - {}".format(self.customer, self.technician, self.date_and_time)
